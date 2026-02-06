@@ -1,6 +1,6 @@
 import re
 import time
-# from collections import namedtuple
+import os
 
 class TermFrequencies:
     def __init__(self, doc_freq, global_freq, term=''):
@@ -16,6 +16,9 @@ class TermFrequencies:
 # store unique stemmed words in a hashtable or dictionary
 # write unique stemmed words to dictionary.txt file after reading is complete
 
+wiki_file_path = os.path.join('tiny_wikipedia', 'tinier_wikipedia.txt') # 'tiny_wikipedia.txt')
+dictionary_file_path = os.path.join('output', 'dictionary.txt')
+unigrams_file_path = os.path.join('output', 'unigrams.txt')
 
 def tokenize_document_to_terms(line):
     terms = re.split(r'\W+', line)
@@ -23,16 +26,15 @@ def tokenize_document_to_terms(line):
     # RegEx for url: ^https:\/\/[^\s]+ ...
     return terms
     
-    # sort the dictionary by global term frequency
-    sorted_by_gf = sorted(full_dict.items(), key=lambda item: item[1].global_freq, reverse=True)
+    # # sort the dictionary by global term frequency
+    # sorted_by_gf = sorted(full_dict.items(), key=lambda item: item[1].global_freq, reverse=True)
 
-    with open('unigrams.txt', "w", encoding="ascii") as dFile :
+    # with open(unigrams_file_path, "w", encoding="ascii") as dFile :
 
-        for k, v in sorted_by_gf:
-            print(f'{v.word_code} {k} {v.doc_freq} {v.global_freq}', file=dFile)
+    #     for k, v in sorted_by_gf:
+    #         print(f'{v.word_code} {k} {v.doc_freq} {v.global_freq}', file=dFile)
 
 def process_docs_into_list():
-    # WordCounts = namedtuple('WordCounts', ['doc_count', 'global_count'], defaults=[0,0])
 
     # dictionary of unique words and associated WordFrequencies. 
     # use this for fast access by term to check presence and assign values to global_freq and doc_freq counters
@@ -41,7 +43,7 @@ def process_docs_into_list():
     l = [] # list of same WordFrequencies for sorting in place
 
     doc_count = 0
-    with open('tiny_wikipedia.txt', 'r', encoding="ascii") as wiki:
+    with open(wiki_file_path, 'r', encoding="ascii") as wiki:
         for doc in wiki:
 
             doc_terms = set() # empty set, unique words in this article
@@ -76,7 +78,7 @@ def produce_dictionary_file_from_list(list):
     # sort list in-place by term 
     list.sort(key=lambda x: x.term)
     cnt = 0 # this will be word-code
-    with open('dictionary.txt', "w", encoding="ascii") as dFile :
+    with open(dictionary_file_path, "w", encoding="ascii") as dFile :
         for item in list:
             print(item.term, file=dFile)
             item.word_code = cnt # set word code for unigrams output
@@ -86,7 +88,7 @@ def produce_unigrams_file_from_list(list):
     # sort list in-place by global frequency descending
     list.sort(key=lambda x: x.global_freq, reverse=True)
 
-    with open('unigrams.txt', "w", encoding="ascii") as dFile :
+    with open(unigrams_file_path, "w", encoding="ascii") as dFile :
         for item in list:
             print(f'{item.word_code} {item.term} {item.doc_freq} {item.global_freq}', file=dFile)
 
