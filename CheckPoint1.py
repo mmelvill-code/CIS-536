@@ -1,6 +1,7 @@
 import re
 import time
 import os
+import nltk
 
 class TermFrequencies:
     def __init__(self, doc_freq, global_freq, term=''):
@@ -22,8 +23,10 @@ unigrams_file_path = os.path.join('output', 'unigrams.txt')
 
 def tokenize_document_to_terms(line):
     terms = re.split(r'\W+', line)
-    # perform stemming here?
     # RegEx for url: ^https:\/\/[^\s]+ ...
+
+    # perform stemming here?
+    # terms = nltk.word_tokenize(line)
     return terms
     
     # # sort the dictionary by global term frequency
@@ -36,11 +39,11 @@ def tokenize_document_to_terms(line):
 
 def process_docs_into_list():
 
-    # dictionary of unique words and associated WordFrequencies. 
+    # dictionary of unique words and associated TermFrequencies. 
     # use this for fast access by term to check presence and assign values to global_freq and doc_freq counters
     d = {}
 
-    l = [] # list of same WordFrequencies for sorting in place
+    l = [] # list of same TermFrequencies for sorting in place
 
     doc_count = 0
     with open(wiki_file_path, 'r', encoding="ascii") as wiki:
@@ -56,7 +59,7 @@ def process_docs_into_list():
                 entry = d.get(term) # look for word in dictionary
                 if entry is None:
                     # term is not already present in global dictionary
-                    newTerm = TermFrequencies(1,1, term) # create new WordFrequencies object
+                    newTerm = TermFrequencies(1,1, term) # create new TermFrequencies object
                     d[term] = newTerm # add new word to global list
                     doc_terms.add(term) # add new term to doc terms (can't possibly already be there)
                     l.append(newTerm) # append same new term list for sorting later
