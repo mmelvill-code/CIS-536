@@ -17,12 +17,19 @@ class TermFrequencies:
 
 # make sure to meet all specific requirements (no HTML tags, urls )
     # Your parser should ignore all the URLs and any markup tag found in the text (for example: <br/>).
-    # get rid of "curid=69137996"
 # check notes for other requirements mentioned
     # throw out stop words?
     # handle dates?
-# numbers, parenthesis, punctuation, 
+# other (mine)
+    # numbers, parenthesis, punctuation, 
+    # get rid of "curid=69137996"
 # create build file for easy build and run
+
+# submit: 
+    # CheckPoint1.py
+    # readme.txt
+    # dictionary.txt
+    # unigrams.txt
 
 wiki_file_path = os.path.join('tiny_wikipedia', 'tiny_wikipedia.txt') # 'tiny_wikipedia.txt') #'tinier_wikipedia.txt')
 dictionary_file_path = os.path.join('output', 'dictionary.txt')
