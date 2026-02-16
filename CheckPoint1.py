@@ -31,9 +31,9 @@ class TermFrequencies:
     # dictionary.txt
     # unigrams.txt
 
-wiki_file_path = os.path.join('tiny_wikipedia', 'tiny_wikipedia.txt') # 'tiny_wikipedia.txt') #'tinier_wikipedia.txt')
-dictionary_file_path = os.path.join('output', 'dictionary.txt')
-unigrams_file_path = os.path.join('output', 'unigrams.txt')
+wiki_file_path = 'tinier_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.txt'
+dictionary_file_path = 'dictionary.txt'
+unigrams_file_path = 'unigrams.txt'
 
 def tokenize_document_to_terms(line):
     # terms = re.split(r'\W+', line)

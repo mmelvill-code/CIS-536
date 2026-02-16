@@ -2,9 +2,11 @@ To build and execute this program:
 
 1) Create a new folder for this project. Have a command line terminal opened at that folder location.
 
-2) Add the file CheckPoint1.py to the folder created in step 1.
+2) Add the following files to the folder created in step 1
+CheckPoint1.py
+tiny_wikipedia.txt
 
-3) Create a python virutal environment for the project.
+3) Create a python virtual environment for the project.
 
 At the terminal type:
 
@@ -27,9 +29,7 @@ At the terminal, type:
 >>> nltk.download('wordnet', download_dir='./nltk_data')
 >>> exit()
 
-6) Create a folder called "tiny_wikipedia". Put your copy of tiny_wikipedia.txt in it.
-
-7) Execute the python script.
+6) Execute the python script.
 
 At the terminal, type:
 
