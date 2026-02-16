@@ -31,7 +31,7 @@ class TermFrequencies:
     # dictionary.txt
     # unigrams.txt
 
-wiki_file_path = 'tinier_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.txt'
+wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.txt'
 dictionary_file_path = 'dictionary.txt'
 unigrams_file_path = 'unigrams.txt'
 
