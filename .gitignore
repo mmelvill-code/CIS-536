@@ -1,2 +1,5 @@
 .venv/
 nltk_data/
+dictionary.txt
+unigrams.txt
+tiny_wikipedia_orig.txt
