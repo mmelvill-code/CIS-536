@@ -2,6 +2,9 @@ import re
 import time
 import os
 import nltk
+nltk.data.path.append('./nltk_data')
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer as wnl
 
 class TermFrequencies:
     def __init__(self, doc_freq, global_freq, term=''):
@@ -12,30 +15,24 @@ class TermFrequencies:
 
 ## next tasks
 
-# convert all to ALL CAPS?
-# figure out "stemmer" and/or lemmatizer
-# store unique stemmed words in a hashtable or dictionary
-# write unique stemmed words to dictionary.txt file after reading is complete
+# make sure to meet all specific requirements (no HTML tags, urls )
+    # Your parser should ignore all the URLs and any markup tag found in the text (for example: <br/>).
+    # get rid of "curid=69137996"
+# check notes for other requirements mentioned
+    # throw out stop words?
+    # handle dates?
+# numbers, parenthesis, punctuation, 
+# create build file for easy build and run
 
-wiki_file_path = os.path.join('tiny_wikipedia', 'tinier_wikipedia.txt') # 'tiny_wikipedia.txt')
+wiki_file_path = os.path.join('tiny_wikipedia', 'tiny_wikipedia.txt') # 'tiny_wikipedia.txt') #'tinier_wikipedia.txt')
 dictionary_file_path = os.path.join('output', 'dictionary.txt')
 unigrams_file_path = os.path.join('output', 'unigrams.txt')
 
 def tokenize_document_to_terms(line):
-    terms = re.split(r'\W+', line)
+    # terms = re.split(r'\W+', line)
     # RegEx for url: ^https:\/\/[^\s]+ ...
-
-    # perform stemming here?
-    # terms = nltk.word_tokenize(line)
+    terms = nltk.word_tokenize(line)
     return terms
-    
-    # # sort the dictionary by global term frequency
-    # sorted_by_gf = sorted(full_dict.items(), key=lambda item: item[1].global_freq, reverse=True)
-
-    # with open(unigrams_file_path, "w", encoding="ascii") as dFile :
-
-    #     for k, v in sorted_by_gf:
-    #         print(f'{v.word_code} {k} {v.doc_freq} {v.global_freq}', file=dFile)
 
 def process_docs_into_list():
 
@@ -54,7 +51,8 @@ def process_docs_into_list():
             terms = tokenize_document_to_terms(doc)
 
             for term in terms:
-                # stemming here or in tokenizer?
+                # stemming here 
+                term = wnl().lemmatize(term)
 
                 entry = d.get(term) # look for word in dictionary
                 if entry is None:
