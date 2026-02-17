@@ -3,7 +3,7 @@ import time
 import os
 import nltk
 nltk.data.path.append('./nltk_data')
-from nltk.tokenize import word_tokenize
+# from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer as wnl
 
 class TermFrequencies:
@@ -15,15 +15,9 @@ class TermFrequencies:
 
 ## next tasks
 
-# make sure to meet all specific requirements (no HTML tags, urls )
-    # Your parser should ignore all the URLs and any markup tag found in the text (for example: <br/>).
 # check notes for other requirements mentioned
     # throw out stop words?
-    # handle dates?
-# other (mine)
-    # numbers, parenthesis, punctuation, 
-    # get rid of "curid=69137996"
-# create build file for easy build and run
+# check accuracy of readme.txt before submit
 
 # submit: 
     # CheckPoint1.py
@@ -35,11 +29,34 @@ wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.
 dictionary_file_path = 'dictionary.txt'
 unigrams_file_path = 'unigrams.txt'
 
+splitter = r'[^a-zA-Z0-9_-]'
+
 def tokenize_document_to_terms(line):
-    # terms = re.split(r'\W+', line)
-    # RegEx for url: ^https:\/\/[^\s]+ ...
-    terms = nltk.word_tokenize(line)
+
+    # remove https://en.wikipedia.org/wiki?curid=########## and all other urls
+    # line = re.sub(r'^[^ ]* ', '', line)
+    line = re.sub(r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)', '', line)
+
+    # remove #lt; and similar
+    line = re.sub(r'#[a-z]+;[a-zA-Z_-]+#[a-z]+;', '', line)
+
+    # replace #amp; and similar with space 
+    line = re.sub('#[a-z]+;', ' ', line)
+
+    # split by all non alphanumeric values, allow underscore (_) and dash (-)
+    terms = re.split(splitter, line)
+
     return terms
+
+def lemmatize_token(token):
+    # stemming here 
+    # if starts or ends with dashes or underscores, remove dashes and underscores
+    token = re.sub(r'((^[-_]+(?=[a-zA-Z0-9_-]))|((?<=[a-zA-Z0-9_-])[-_]+$)|^([-_]+)$)', '', token)
+
+    # convert to all lower case
+    token = token.lower()
+
+    return wnl().lemmatize(token)
 
 def process_docs_into_list():
 
@@ -47,37 +64,39 @@ def process_docs_into_list():
     # use this for fast access by term to check presence and assign values to global_freq and doc_freq counters
     d = {}
 
-    l = [] # list of same TermFrequencies for sorting in place
+    l = [] # list of same TermFrequency objects for sorting in place
 
     doc_count = 0
     with open(wiki_file_path, 'r', encoding="ascii") as wiki:
         for doc in wiki:
 
-            doc_terms = set() # empty set, unique words in this article
+            doc_tokens = set() # empty set, unique words in this article
 
-            terms = tokenize_document_to_terms(doc)
+            tokens = tokenize_document_to_terms(doc)
 
-            for term in terms:
+            for token in tokens:
                 # stemming here 
-                term = wnl().lemmatize(term)
+                term = lemmatize_token(token)
+                if(term==''):
+                    continue
 
                 entry = d.get(term) # look for word in dictionary
                 if entry is None:
                     # term is not already present in global dictionary
                     newTerm = TermFrequencies(1,1, term) # create new TermFrequencies object
                     d[term] = newTerm # add new word to global list
-                    doc_terms.add(term) # add new term to doc terms (can't possibly already be there)
+                    doc_tokens.add(term) # add new term to doc terms (can't possibly already be there)
                     l.append(newTerm) # append same new term list for sorting later
                 else:
                     term_global_freq = d[term].global_freq
                     d[term].global_freq = term_global_freq + 1
         
                     # has this word already been found in this article?
-                    if( term not in doc_terms):
+                    if( term not in doc_tokens):
                         # word has not been found in this doc yet
                         term_doc_freq = d[term].doc_freq # get current doc count for this term
                         d[term].doc_freq = term_doc_freq + 1 # increment it
-                        doc_terms.add(term) # add it to doc terms list
+                        doc_tokens.add(term) # add it to doc terms list
             doc_count += 1
     print(f'doc_count: {doc_count}')
     return l
