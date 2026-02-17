@@ -6,7 +6,7 @@ nltk.data.path.append('./nltk_data')
 # from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer as wnl
 
-class TermFrequencies:
+class TermFrequency:
     def __init__(self, doc_freq, global_freq, term=''):
         self.term = term
         self.word_code = 0
@@ -83,7 +83,7 @@ def process_docs_into_list():
                 entry = d.get(term) # look for word in dictionary
                 if entry is None:
                     # term is not already present in global dictionary
-                    newTerm = TermFrequencies(1,1, term) # create new TermFrequencies object
+                    newTerm = TermFrequency(1,1, term) # create new TermFrequency object
                     d[term] = newTerm # add new word to global list
                     doc_tokens.add(term) # add new term to doc terms (can't possibly already be there)
                     l.append(newTerm) # append same new term list for sorting later
