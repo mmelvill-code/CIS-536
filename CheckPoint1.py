@@ -29,7 +29,7 @@ wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.
 dictionary_file_path = 'dictionary.txt'
 unigrams_file_path = 'unigrams.txt'
 
-splitter = r'[^a-zA-Z0-9_-]'
+splitter = r'[^a-zA-Z0-9-]|--+' # r'[^a-zA-Z0-9_-]'
 
 def tokenize_document_to_terms(line):
 
@@ -40,18 +40,18 @@ def tokenize_document_to_terms(line):
     # remove #lt;---these-tags-and-the-stuff-between-them---#gt;
     line = re.sub(r'#[a-z]+;[a-zA-Z_-]+#[a-z]+;', '', line)
 
-    # replace #amp; and similar with space 
+    # replace #amp; and similar single symbols with space 
     line = re.sub('#[a-z]+;', ' ', line)
 
-    # split by all non alphanumeric values, allow underscore (_) and dash (-)
-    terms = re.split(splitter, line)
+    # split by all non alphanumeric values, or multiple dashes
+    terms = re.split(r'[^a-zA-Z0-9-]|--+', line)
 
     return terms
 
 def lemmatize_token(token):
     # stemming here 
-    # if starts or ends with dashes or underscores, remove dashes and underscores
-    token = re.sub(r'((^[-_]+(?=[a-zA-Z0-9_-]))|((?<=[a-zA-Z0-9_-])[-_]+$)|^([-_]+)$)', '', token)
+    # if starts or ends with dashes, remove dashes
+    token = re.sub(r'((^[-]+(?=[a-zA-Z0-9-]))|((?<=[a-zA-Z0-9-])[-]+$)|^([-]+)$)', '', token)
 
     # convert to all lower case
     token = token.lower()
