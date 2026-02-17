@@ -37,7 +37,7 @@ def tokenize_document_to_terms(line):
     # line = re.sub(r'^[^ ]* ', '', line)
     line = re.sub(r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)', '', line)
 
-    # remove #lt; and similar
+    # remove #lt;---these-tags-and-the-stuff-between-them---#gt;
     line = re.sub(r'#[a-z]+;[a-zA-Z_-]+#[a-z]+;', '', line)
 
     # replace #amp; and similar with space 
