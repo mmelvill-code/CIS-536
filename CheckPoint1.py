@@ -1,9 +1,7 @@
 import re
 import time
-import os
 import nltk
 nltk.data.path.append('./nltk_data')
-# from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.tag import pos_tag
 
@@ -17,17 +15,13 @@ class TermFrequency:
 
 ## next tasks
 
-# check notes for other requirements mentioned
-    # throw out stop words?
-# check accuracy of readme.txt before submit
-
 # submit: 
     # CheckPoint1.py
     # readme.txt
     # dictionary.txt
     # unigrams.txt
 
-wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.txt'
+wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia_1000.txt' #'tiny_wikipedia_10.txt' 'tiny_wikipedia.txt'
 dictionary_file_path = 'dictionary.txt'
 unigrams_file_path = 'unigrams.txt'
 
@@ -42,12 +36,13 @@ replacers = [
     r'(#[a-z]+;)',
 
     # remove dashes unless it is a hyphenated word
-    # r'(([^a-zA-Z0-9-]-+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)-+[^a-zA-Z0-9-])|(--+)|(^-)|(-$))'
     r"(([^a-zA-Z0-9-'](-|')+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)(-|')+[^a-zA-Z0-9-'])|(--+)|(''+)|(^-)|(-$))",
 
     # get rid of 's
     r"'s(?=[^a-zA-Z0-9-])"
 ]
+
+regex_replace = re.compile("|".join(replacers))
 
 wnl = WordNetLemmatizer()
 
@@ -67,7 +62,6 @@ def process_docs_into_list():
     l = [] # list of same TermFrequency objects for sorting in place
 
     doc_count = 0
-    
 
     with open(wiki_file_path, 'r', encoding="ascii") as wiki:
         for doc in wiki:
@@ -77,11 +71,10 @@ def process_docs_into_list():
             doc_tokens = set() # empty set, unique words in this article
 
             # clean document
-            regex_replace = "|".join(replacers) # see definition of replacers for details
-            doc = re.sub(regex_replace, ' ', doc)
+            doc = regex_replace.sub(' ', doc) # doc = re.sub(regex_replace, ' ', doc)
 
             # tokenize doc
-            # split doc into tokens by anything that is not a letter, number, hyphen, or possessive apostrophe
+            # split doc into tokens by anything that is not a letter, number, hyphen, or apostrophe
             tokens = re.split(r"[^a-zA-Z0-9-']", doc) 
 
             # get parts of speech tagged
@@ -92,7 +85,10 @@ def process_docs_into_list():
                 token = token.lower()
                 wn_tag = pos_tag_to_wnl_tag.get(raw_tag[0], 'n')
                 term = wnl.lemmatize(token, wn_tag)
-                if(term==''):
+
+                # exclude stop words. list based on previous runs and unigrams.txt output
+                if term in ('', 'the', 'of', 'be', 'in', 'a', 'and', 'to', 'on', 'for', 'he', 'with', 'by', 'at', 'it', 'have', 'from', 'his', 'that', 
+                            'an', 'she', 'which', 'her', 'also', 'after', 'this', 'but', 'not', 'or', 'use', 'would', 'when', 'other'):
                     continue
 
                 entry = d.get(term) # look for word in dictionary
