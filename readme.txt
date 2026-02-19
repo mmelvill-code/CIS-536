@@ -26,6 +26,7 @@ At the terminal, type:
 > python
 >>> import nltk
 >>> nltk.download('wordnet', download_dir='./nltk_data')
+>>> nltk.download('averaged_perceptron_tagger_eng', download_dir='./nltk_data')
 >>> exit()
 
 6) Execute the python script.

@@ -4,7 +4,9 @@ import os
 import nltk
 nltk.data.path.append('./nltk_data')
 # from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer as wnl
+from nltk.stem import WordNetLemmatizer
+from nltk.tag import pos_tag
+
 
 class TermFrequency:
     def __init__(self, doc_freq, global_freq, term=''):
@@ -29,34 +31,32 @@ wiki_file_path = 'tiny_wikipedia.txt' # 'tiny_wikipedia.txt' #'tinier_wikipedia.
 dictionary_file_path = 'dictionary.txt'
 unigrams_file_path = 'unigrams.txt'
 
-splitter = r'[^a-zA-Z0-9-]|--+' # r'[^a-zA-Z0-9_-]'
-
-def tokenize_document_to_terms(line):
-
+replacers = [
     # remove https://en.wikipedia.org/wiki?curid=########## and all other urls
-    # line = re.sub(r'^[^ ]* ', '', line)
-    line = re.sub(r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)', '', line)
+    r'(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*))',
 
     # remove #lt;---these-tags-and-the-stuff-between-them---#gt;
-    line = re.sub(r'#[a-z]+;[a-zA-Z_-]+#[a-z]+;', '', line)
+    r'(#[a-z]+;\/?[a-zA-Z_-]+#[a-z]+;)',
 
-    # replace #amp; and similar single symbols with space 
-    line = re.sub('#[a-z]+;', ' ', line)
+    # remove #amp; and similar single symbols 
+    r'(#[a-z]+;)',
 
-    # split by all non alphanumeric values, or multiple dashes
-    terms = re.split(r'[^a-zA-Z0-9-]|--+', line)
+    # remove dashes unless it is a hyphenated word
+    # r'(([^a-zA-Z0-9-]-+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)-+[^a-zA-Z0-9-])|(--+)|(^-)|(-$))'
+    r"(([^a-zA-Z0-9-'](-|')+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)(-|')+[^a-zA-Z0-9-'])|(--+)|(''+)|(^-)|(-$))",
 
-    return terms
+    # get rid of 's
+    r"'s(?=[^a-zA-Z0-9-])"
+]
 
-def lemmatize_token(token):
-    # stemming here 
-    # if starts or ends with dashes, remove dashes
-    token = re.sub(r'((^[-]+(?=[a-zA-Z0-9-]))|((?<=[a-zA-Z0-9-])[-]+$)|^([-]+)$)', '', token)
+wnl = WordNetLemmatizer()
 
-    # convert to all lower case
-    token = token.lower()
-
-    return wnl().lemmatize(token)
+pos_tag_to_wnl_tag = {
+    'N': 'n',
+    'V': 'v',
+    'J': 'a',
+    'R': 'r'
+}
 
 def process_docs_into_list():
 
@@ -67,16 +67,31 @@ def process_docs_into_list():
     l = [] # list of same TermFrequency objects for sorting in place
 
     doc_count = 0
+    
+
     with open(wiki_file_path, 'r', encoding="ascii") as wiki:
         for doc in wiki:
 
+            if(doc_count % 1000 == 0):
+                print(f'Starting doc {doc_count}')
             doc_tokens = set() # empty set, unique words in this article
 
-            tokens = tokenize_document_to_terms(doc)
+            # clean document
+            regex_replace = "|".join(replacers) # see definition of replacers for details
+            doc = re.sub(regex_replace, ' ', doc)
 
-            for token in tokens:
-                # stemming here 
-                term = lemmatize_token(token)
+            # tokenize doc
+            # split doc into tokens by anything that is not a letter, number, hyphen, or possessive apostrophe
+            tokens = re.split(r"[^a-zA-Z0-9-']", doc) 
+
+            # get parts of speech tagged
+            doc_pos = pos_tag(tokens)
+
+            for token, raw_tag in doc_pos:
+                # lemmatize here 
+                token = token.lower()
+                wn_tag = pos_tag_to_wnl_tag.get(raw_tag[0], 'n')
+                term = wnl.lemmatize(token, wn_tag)
                 if(term==''):
                     continue
 
