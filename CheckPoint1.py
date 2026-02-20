@@ -36,12 +36,24 @@ replacers = [
     r'(#[a-z]+;)',
 
     # remove dashes unless it is a hyphenated word
-    r"(([^a-zA-Z0-9-'](-|')+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)(-|')+[^a-zA-Z0-9-'])|(--+)|(''+)|(^-)|(-$))",
+    # r"(([^a-zA-Z0-9-'](-|')+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)(-|')+[^a-zA-Z0-9-'])|(--+)|(''+)|(^-)|(-$))",
+    # r'(([^a-zA-Z0-9-]-+(?=[a-zA-Z0-9]+))|((?![a-zA-Z0-9]+)-+[^a-zA-Z0-9-])|(--+)|(^-)|(-$))',
+    # '((--+)|(-(?=[^a-zA-Z0-9]))|((?=[^a-zA-Z0-9])-))',
+    # '(([^a-zA-Z0-9])-)|(-([^a-zA-Z0-9]))|(--+)|(^-)|(-$)',
+    # r'((^-)|(-$)|(--+)|(-+[^a-zA-Z0-9])|([^a-zA-Z0-9]-+))',
+    r"((^[-']+)|([-']+$)|(-(?=[^a-zA-Z0-9]))|((?<=[^a-zA-Z0-9])-))",
+
+    # get rid of single quotes but keep apostrophes in contractions
+    # r"(([^a-zA-Z0-9]|^)')|('([^a-zA-Z0-9]|$))",
+    # r"((?=[^a-zA-Z0-9])')|('(?<=[^a-zA-Z0-9]))",
+    r"((?<=[^a-zA-Z0-9])')|('(?=[^a-zA-Z0-9]))",
 
     # get rid of 's
-    r"'s(?=[^a-zA-Z0-9-])"
+    # r"('s(([^a-zA-Z0-9])|$)-?)"
+    # r"('s(([^a-zA-Z0-9])|$)[-']?)"
+    r"('s([^a-zA-Z0-9])|$)"
 ]
-
+# print("|".join(replacers))
 regex_replace = re.compile("|".join(replacers))
 
 wnl = WordNetLemmatizer()
@@ -72,9 +84,10 @@ def process_docs_into_list():
 
             # clean document
             doc = regex_replace.sub(' ', doc) # doc = re.sub(regex_replace, ' ', doc)
-
+            # print(doc)
             # tokenize doc
-            # split doc into tokens by anything that is not a letter, number, hyphen, or apostrophe
+            # split doc into tokens by anythi
+            # ng that is not a letter, number, hyphen, or apostrophe
             tokens = re.split(r"[^a-zA-Z0-9-']", doc) 
 
             # get parts of speech tagged
@@ -85,7 +98,7 @@ def process_docs_into_list():
                 token = token.lower()
                 wn_tag = pos_tag_to_wnl_tag.get(raw_tag[0], 'n')
                 term = wnl.lemmatize(token, wn_tag)
-
+                # print(f'lemmatize: {token} --> {term}')
                 # exclude stop words. list based on previous runs and unigrams.txt output
                 if term in ('', 'the', 'of', 'be', 'in', 'a', 'and', 'to', 'on', 'for', 'he', 'with', 'by', 'at', 'it', 'have', 'from', 'his', 'that', 
                             'an', 'she', 'which', 'her', 'also', 'after', 'this', 'but', 'not', 'or', 'use', 'would', 'when', 'other'):
